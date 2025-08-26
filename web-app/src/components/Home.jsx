@@ -2,6 +2,7 @@ import { Box, Card, CircularProgress, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getToken } from '../services/localStorageService';
+import Header from './header/Header';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -10,18 +11,22 @@ export default function Home() {
   const getUserDetails = async (accessToken) => {
     const response = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${accessToken}`);
     const data = await response.json();
+    console.log(data);
 
     setUserDetails(data);
   };
 
   useEffect(() => {
     const accessToken = getToken();
+    console.log(accessToken);
+
     if (!accessToken) navigate('/login');
     getUserDetails(accessToken);
   }, [navigate]);
 
   return (
     <>
+      <Header></Header>
       {userDetails ? (
         <Box
           display='flex'
