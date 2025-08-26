@@ -8,23 +8,15 @@ export default function Authenticate() {
   const [isLoggedin, setIsLoggedin] = useState(false);
 
   useEffect(() => {
-    const authCodeRegex = /code=([^&]+)/;
-    const isMatch = window.location.href.match(authCodeRegex);
+    console.log(window.location.href);
+    const accessTokenRegex = /access_token=([^&]+)/;
+    const isMatch = window.location.href.match(accessTokenRegex);
 
     if (isMatch) {
-      const authCode = isMatch[1];
-
-      fetch(`http://localhost:8080/identity/auth/outbound/authentication?code=${authCode}`, {
-        method: 'POST',
-      })
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          console.log(data);
-          setToken(data.result?.token);
-          setIsLoggedin(true);
-        });
+      const accessToken = isMatch[1];
+      console.log('Token: ', accessToken);
+      setToken(accessToken);
+      setIsLoggedin(true);
     }
   }, []);
 
