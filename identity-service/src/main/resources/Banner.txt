@@ -1,0 +1,9 @@
+${Ansi.GREEN}=======================================
+${Ansi.GREEN}   Power by Spring Boot
+${Ansi.GREEN}   Project: Identity service || IAM
+${Ansi.GREEN}   Author: huyvp
+${Ansi.GREEN}   GitHub repo:
+${Ansi.GREEN}   Start Date: 06/2024
+${Ansi.GREEN}   Tech Stack: Spring boot, postgresSql
+${Ansi.GREEN}=======================================
+${Ansi.GREEN} :: Spring Boot${spring-boot.formatted-version} :: ${Ansi.DEFAULT}
