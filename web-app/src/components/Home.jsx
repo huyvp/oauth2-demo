@@ -9,11 +9,19 @@ export default function Home() {
   const [userDetails, setUserDetails] = useState({});
 
   const getUserDetails = async (accessToken) => {
-    const response = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${accessToken}`);
-    const data = await response.json();
-    console.log(data);
+    const response = await fetch(`http://localhost:9001/identity/users/my-info`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+    });
 
-    setUserDetails(data);
+    const data = await response.json();
+
+    console.log(data.result);
+
+    setUserDetails(data.result);
   };
 
   useEffect(() => {
