@@ -1,14 +1,17 @@
-import { Box, Button, Card, CardActions, CardContent, Divider, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Card, CardActions, CardContent, Divider, Snackbar, TextField, Typography } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import { useEffect, useState } from 'react';
 import { getToken, setToken } from '../services/localStorageService';
-import { data, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { OAuthConfig } from '../configurations/googleApiConfig';
 
 export default function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [snackBarOpen, setSnackBarOpen] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState("");
+  const [snackType, setSnackType] = useState("error");
 
   useEffect(() => {
     const accessToken = getToken();
@@ -17,10 +20,6 @@ export default function Login() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    console.log('Username:', username);
-    console.log('Password:', password);
-
     const payload = {
       username: username,
       password: password
@@ -33,13 +32,16 @@ export default function Login() {
       },
       body: JSON.stringify(payload),
     })
-      .then(response => {
-        return response.json;
+      .then((response) => {
+        return response.json();
       })
-      .then(data => {
-        console.log(data);
-        setToken(data.result);
+      .then((data) => {
+        if (data?.code !== 2000) throw new Error(data?.message)
+        setToken(data?.result);
         navigate('/');
+      })
+      .catch((error) => {
+        showError(error.message)
       })
   };
 
@@ -61,8 +63,35 @@ export default function Login() {
     window.location.href = targetUrl;
   };
 
+  const handleCloseSnackBar = (reason) => {
+    if (reason === "clickaway") return;
+    setSnackBarOpen(false);
+  };
+
+  const showError = (message) => {
+    setSnackType("error");
+    setSnackBarMessage(message);
+    setSnackBarOpen(true);
+  };
+
+
   return (
     <>
+      <Snackbar
+        open={snackBarOpen}
+        onClose={handleCloseSnackBar}
+        autoHideDuration={6000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={handleCloseSnackBar}
+          severity={snackType}
+          variant='filled'
+          sx={{ width: '100%' }}
+        >
+          {snackBarMessage}
+        </Alert>
+      </Snackbar >
       <Box
         display='flex'
         flexDirection='column'
