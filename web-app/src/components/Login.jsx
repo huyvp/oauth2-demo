@@ -1,7 +1,7 @@
-import { Box, Button, Card, CardActions, CardContent, Divider, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Card, CardActions, CardContent, Divider, Snackbar, TextField, Typography } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import { useEffect, useState } from 'react';
-import { getToken } from '../services/localStorageService';
+import { getToken, setToken } from '../services/localStorageService';
 import { useNavigate } from 'react-router-dom';
 import { OAuthConfig } from '../configurations/googleApiConfig';
 
@@ -9,6 +9,9 @@ export default function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [snackBarOpen, setSnackBarOpen] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState("");
+  const [snackType, setSnackType] = useState("error");
 
   useEffect(() => {
     const accessToken = getToken();
@@ -17,8 +20,29 @@ export default function Login() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log('Username:', username);
-    console.log('Password:', password);
+    const payload = {
+      username: username,
+      password: password
+    }
+
+    fetch(`http://localhost:9001/identity/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        if (data?.code !== 2000) throw new Error(data?.message)
+        setToken(data?.result);
+        navigate('/');
+      })
+      .catch((error) => {
+        showError(error.message)
+      })
   };
 
   const handleClick = () => {
@@ -28,7 +52,7 @@ export default function Login() {
 
     const targetUrl = `${authUrl}?redirect_uri=${encodeURIComponent(
       callbackUrl,
-    )}&response_type=token&client_id=${googleClientId}&scope=openid%20email%20profile`;
+    )}&response_type=code&client_id=${googleClientId}&scope=openid%20email%20profile`;
 
     // const targetUrl = `${authUrl}?redirect_uri=${encodeURIComponent(
     //   callbackUrl
@@ -39,8 +63,35 @@ export default function Login() {
     window.location.href = targetUrl;
   };
 
+  const handleCloseSnackBar = (reason) => {
+    if (reason === "clickaway") return;
+    setSnackBarOpen(false);
+  };
+
+  const showError = (message) => {
+    setSnackType("error");
+    setSnackBarMessage(message);
+    setSnackBarOpen(true);
+  };
+
+
   return (
     <>
+      <Snackbar
+        open={snackBarOpen}
+        onClose={handleCloseSnackBar}
+        autoHideDuration={6000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={handleCloseSnackBar}
+          severity={snackType}
+          variant='filled'
+          sx={{ width: '100%' }}
+        >
+          {snackBarMessage}
+        </Alert>
+      </Snackbar >
       <Box
         display='flex'
         flexDirection='column'
@@ -84,7 +135,7 @@ export default function Login() {
           </CardContent>
           <CardActions>
             <Box display='flex' flexDirection='column' width='100%' gap='25px'>
-              <Button type='submit' variant='contained' color='primary' size='large' fullWidth>
+              <Button type='submit' variant='contained' color='primary' size='large' onClick={handleSubmit} fullWidth>
                 Login
               </Button>
               <Button
