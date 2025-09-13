@@ -1,0 +1,35 @@
+server:
+  port: 9001
+  servlet:
+    context-path: /identity
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:123456}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+jwt:
+  signerKey: SpringBootTrainingsdfhsdfgsr4gsfgsregsfgsfdg#$%S%G
+  valid-duration: 3600
+  refreshable-duration: 120
+
+application:
+  service:
+    profile: http://localhost:9091/profile
+
+google:
+  client-id: ${client-id}
+  client-secret: ${client-secret}
+  redirect-uri: "http://localhost:3000/authenticate"
+
+#logging:
+#  level:
+#    org.springframework.web: debug
+#    org.springframework.security: info
