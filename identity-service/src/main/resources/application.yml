@@ -25,10 +25,11 @@ application:
     profile: http://localhost:9091/profile
 
 google:
-  client-id: "client-id"
-  client-secret: "secret"
+  client-id: ${client-id}
+  client-secret: ${client-secret}
   redirect-uri: "http://localhost:3000/authenticate"
 
-logging:
-  level:
-    org.springframework.security: debug
+#logging:
+#  level:
+#    org.springframework.web: debug
+#    org.springframework.security: info
